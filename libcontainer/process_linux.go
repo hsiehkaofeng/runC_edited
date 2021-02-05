@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
-
+	//"log"
 	"github.com/opencontainers/runc/libcontainer/cgroups"
 	"github.com/opencontainers/runc/libcontainer/cgroups/fs2"
 	"github.com/opencontainers/runc/libcontainer/configs"
@@ -87,6 +87,8 @@ func (p *setnsProcess) signal(sig os.Signal) error {
 }
 
 func (p *setnsProcess) start() (retErr error) {
+	
+	
 	defer p.messageSockPair.parent.Close()
 	err := p.cmd.Start()
 	// close the write-side of the pipes (controlled by child)
@@ -309,8 +311,25 @@ func (p *initProcess) waitForChildExit(childPid int) error {
 }
 
 func (p *initProcess) start() (retErr error) {
+	//open the log file
+	/*
+	f, err := os.OpenFile("testlogfile", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("error opening file: %v", err)
+	}
+	defer f.Close()
+
+	log.SetOutput(f)
+	log.Println("log starts ",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond))
+	*/
+	//
+	//fmt.Printf("here");
+	logrus.Info(fmt.Sprintf("log starts %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 	defer p.messageSockPair.parent.Close()
 	err := p.cmd.Start()
+	//
+	//log.Println("second timestamp ",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond))	
+	//
 	p.process.ops = p
 	// close the write-side of the pipes (controlled by child)
 	p.messageSockPair.child.Close()
@@ -506,6 +525,8 @@ func (p *initProcess) start() (retErr error) {
 		p.wait()
 		return ierr
 	}
+	//log.Println("end timestamp ",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond))	
+	logrus.Info(fmt.Sprintf("log ends %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 	return nil
 }
 

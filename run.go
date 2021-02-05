@@ -5,7 +5,13 @@ package main
 import (
 	"os"
 
+	//"github.com/opencontainers/runc/libcontainer/logs"
+	//"github.com/sirupsen/logrus"
+
 	"github.com/urfave/cli"
+
+	"fmt"
+	"time"
 )
 
 // default action is to start a container
@@ -63,6 +69,8 @@ command(s) that get executed on start, edit the args parameter of the spec. See
 		},
 	},
 	Action: func(context *cli.Context) error {
+		fmt.Println(int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond))
+		//logrus.Info(fmt.Sprintf("run starts %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 		if err := checkArgs(context, 1, exactArgs); err != nil {
 			return err
 		}
@@ -73,7 +81,9 @@ command(s) that get executed on start, edit the args parameter of the spec. See
 		if err != nil {
 			return err
 		}
+		fmt.Println(int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond))
 		status, err := startContainer(context, spec, CT_ACT_RUN, nil)
+		fmt.Println(int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond))
 		if err == nil {
 			// exit with the container's exit status so any external supervisor is
 			// notified of the exit with the correct exit status.
