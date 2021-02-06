@@ -5,6 +5,8 @@ package main
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
+	"fmt"
+	"time"
 )
 
 var pauseCommand = cli.Command{
@@ -18,6 +20,7 @@ paused. `,
 
 Use runc list to identify instances of containers and their current status.`,
 	Action: func(context *cli.Context) error {
+		logrus.Info(fmt.Sprintf("pause  %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 		if err := checkArgs(context, 1, exactArgs); err != nil {
 			return err
 		}

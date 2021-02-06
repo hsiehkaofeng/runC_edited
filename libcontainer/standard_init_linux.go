@@ -7,7 +7,8 @@ import (
 	"os/exec"
 	"runtime"
 	"strconv"
-
+	"fmt"
+	"time"
 	"github.com/opencontainers/runc/libcontainer/apparmor"
 	"github.com/opencontainers/runc/libcontainer/configs"
 	"github.com/opencontainers/runc/libcontainer/keys"
@@ -17,6 +18,9 @@ import (
 	"github.com/opencontainers/selinux/go-selinux"
 	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
+
+	//"github.com/sirupsen/logrus"
+	
 )
 
 type linuxStandardInit struct {
@@ -44,6 +48,7 @@ func (l *linuxStandardInit) getSessionRingParams() (string, uint32, uint32) {
 }
 
 func (l *linuxStandardInit) Init() error {
+	//fmt.Println("Init starts ",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond))
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 	if !l.config.Config.NoNewKeyring {
@@ -214,9 +219,11 @@ func (l *linuxStandardInit) Init() error {
 	if err := l.config.Config.Hooks[configs.StartContainer].RunHooks(s); err != nil {
 		return err
 	}
-
+	fmt.Println("exe starts ",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond))
+	//logrus.Info(fmt.Sprintf("exe  %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 	if err := unix.Exec(name, l.config.Args[0:], os.Environ()); err != nil {
 		return newSystemErrorWithCause(err, "exec user process")
 	}
+	fmt.Print("exe ends ",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond))
 	return nil
 }

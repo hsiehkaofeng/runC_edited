@@ -7,6 +7,9 @@ import (
 
 	"github.com/opencontainers/runc/libcontainer"
 	"github.com/urfave/cli"
+
+	"github.com/sirupsen/logrus"
+	"time"
 )
 
 var startCommand = cli.Command{
@@ -19,6 +22,7 @@ are starting. The name you provide for the container instance must be unique on
 your host.`,
 	Description: `The start command executes the user defined process in a created container.`,
 	Action: func(context *cli.Context) error {
+		logrus.Info(fmt.Sprintf("start.go  %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 		if err := checkArgs(context, 1, exactArgs); err != nil {
 			return err
 		}

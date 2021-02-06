@@ -2,8 +2,10 @@ package main
 
 import (
 	"os"
-
+	"fmt"
 	"github.com/urfave/cli"
+	"github.com/sirupsen/logrus"
+	"time"
 )
 
 var createCommand = cli.Command{
@@ -52,6 +54,7 @@ command(s) that get executed on start, edit the args parameter of the spec. See
 		},
 	},
 	Action: func(context *cli.Context) error {
+		logrus.Info(fmt.Sprintf("create.go  %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 		if err := checkArgs(context, 1, exactArgs); err != nil {
 			return err
 		}
@@ -62,6 +65,7 @@ command(s) that get executed on start, edit the args parameter of the spec. See
 		if err != nil {
 			return err
 		}
+		fmt.Print("create.go")
 		status, err := startContainer(context, spec, CT_ACT_CREATE, nil)
 		if err != nil {
 			return err

@@ -1,4 +1,7 @@
-{"level":"info","msg":"startContainer 1612553152870","time":"2021-02-05T14:25:52-05:00"}
-{"level":"info","msg":"startContainer ends 1612553152901","time":"2021-02-05T14:25:52-05:00"}
-{"level":"info","msg":"log starts 1612553152940","time":"2021-02-05T14:25:52-05:00"}
-{"level":"info","msg":"log ends 1612553153353","time":"2021-02-05T14:25:53-05:00"}
+{"level":"info","msg":"create.go  1612570911980","time":"2021-02-05T19:21:51-05:00"}
+{"level":"info","msg":"startContainer 1612570912015","time":"2021-02-05T19:21:52-05:00"}
+{"level":"info","msg":"startContainer ends 1612570912049","time":"2021-02-05T19:21:52-05:00"}
+{"level":"info","msg":"log starts 1612570912086","time":"2021-02-05T19:21:52-05:00"}
+{"level":"info","msg":"main starts 1612570912160","time":"2021-02-05T19:21:52-05:00"}
+{"level":"info","msg":"log ends 1612570912405","time":"2021-02-05T19:21:52-05:00"}
+{"level":"info","msg":"start.go  1612570912452","time":"2021-02-05T19:21:52-05:00"}

@@ -324,7 +324,7 @@ func (p *initProcess) start() (retErr error) {
 	*/
 	//
 	//fmt.Printf("here");
-	logrus.Info(fmt.Sprintf("log starts %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+	logrus.Info(fmt.Sprintf("initProcess starts %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 	defer p.messageSockPair.parent.Close()
 	err := p.cmd.Start()
 	//
@@ -526,7 +526,7 @@ func (p *initProcess) start() (retErr error) {
 		return ierr
 	}
 	//log.Println("end timestamp ",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond))	
-	logrus.Info(fmt.Sprintf("log ends %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+	logrus.Info(fmt.Sprintf("initProcess ends %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 	return nil
 }
 
