@@ -6,7 +6,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
-	"time"
+	//"time"
 	"github.com/opencontainers/runc/libcontainer/logs"
 	"github.com/opencontainers/runc/libcontainer/seccomp"
 	"github.com/opencontainers/runtime-spec/specs-go"
@@ -51,7 +51,7 @@ value for "bundle" is the current directory.`
 )
 
 func main() {
-	logrus.Info(fmt.Sprintf("main starts %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+	//logrus.Info(fmt.Sprintf("main starts %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 	app := cli.NewApp()
 	app.Name = "runc"
 	app.Usage = usage

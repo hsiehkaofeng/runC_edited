@@ -26,7 +26,9 @@ your host.`,
 		if err := checkArgs(context, 1, exactArgs); err != nil {
 			return err
 		}
+		logrus.Info(fmt.Sprintf("getContainer starts %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 		container, err := getContainer(context)
+		logrus.Info(fmt.Sprintf("getContainer ends %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 		if err != nil {
 			return err
 		}
@@ -40,9 +42,11 @@ your host.`,
 			if err != nil {
 				return err
 			}
+			logrus.Info(fmt.Sprintf("container.Exec() starts %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 			if err := container.Exec(); err != nil {
 				return err
 			}
+			logrus.Info(fmt.Sprintf("container.Exec() ends %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 			if notifySocket != nil {
 				return notifySocket.waitForContainer(container)
 			}

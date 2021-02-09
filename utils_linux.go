@@ -9,7 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
-	"time"
+	//"time"
 	"github.com/opencontainers/runc/libcontainer"
 	"github.com/opencontainers/runc/libcontainer/cgroups/systemd"
 	"github.com/opencontainers/runc/libcontainer/configs"
@@ -400,7 +400,7 @@ const (
 )
 
 func startContainer(context *cli.Context, spec *specs.Spec, action CtAct, criuOpts *libcontainer.CriuOpts) (int, error) {
-	logrus.Info(fmt.Sprintf("startContainer %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+	//logrus.Info(fmt.Sprintf("startContainer %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 	id := context.Args().First()
 	if id == "" {
 		return -1, errEmptyID
@@ -455,6 +455,6 @@ func startContainer(context *cli.Context, spec *specs.Spec, action CtAct, criuOp
 		init:            true,
 		logLevel:        logLevel,
 	}
-	logrus.Info(fmt.Sprintf("startContainer ends %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+	//logrus.Info(fmt.Sprintf("startContainer ends %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 	return r.run(spec.Process)
 }
