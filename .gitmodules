@@ -1,0 +1,9 @@
+[submodule "vendor/github.com/hodgesds/perf-utils"]
+	path = vendor/github.com/hodgesds/perf-utils
+	url = https://github.com/hodgesds/perf-utils
+[submodule "vendor/go.uber.org/atomic"]
+	path = vendor/go.uber.org/atomic
+	url = https://github.com/uber-go/atomic
+[submodule "vendor/go.uber.org/multierr"]
+	path = vendor/go.uber.org/multierr
+	url = https://github.com/uber-go/multierr
