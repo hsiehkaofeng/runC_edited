@@ -6,6 +6,7 @@ import (
 	"github.com/urfave/cli"
 	"github.com/sirupsen/logrus"
 	"time"
+	//"github.com/hodgesds/perf-utils"
 )
 
 var createCommand = cli.Command{
