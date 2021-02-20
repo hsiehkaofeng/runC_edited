@@ -1,9 +1,10 @@
-{"level":"info","msg":"create.go  1613685386074","time":"2021-02-18T16:56:26-05:00"}
-{"level":"info","msg":"startContainer starts 1613685386079","time":"2021-02-18T16:56:26-05:00"}
-{"level":"info","msg":"initProcess starts 1613685386086","time":"2021-02-18T16:56:26-05:00"}
-{"level":"info","msg":"initProcess ends 1613685386402","time":"2021-02-18T16:56:26-05:00"}
-{"level":"info","msg":"startContainer ends 1613685386406","time":"2021-02-18T16:56:26-05:00"}
-{"level":"info","msg":"start.go  1613685386425","time":"2021-02-18T16:56:26-05:00"}
-{"level":"info","msg":"getContainer starts 1613685386428","time":"2021-02-18T16:56:26-05:00"}
-{"level":"info","msg":"container.Exec() starts 1613685386433","time":"2021-02-18T16:56:26-05:00"}
-{"level":"info","msg":"container.Exec() ends 1613685386437","time":"2021-02-18T16:56:26-05:00"}
+{"level":"info","msg":"create.go  1613848810749","time":"2021-02-20T19:20:10Z"}
+{"level":"info","msg":"startContainer starts 1613848810759","time":"2021-02-20T19:20:10Z"}
+{"level":"info","msg":"initProcess starts 1613848810785","time":"2021-02-20T19:20:10Z"}
+{"level":"info","msg":"initProcess ends 1613848811077","time":"2021-02-20T19:20:11Z"}
+{"level":"info","msg":"startContainer ends 1613848811078","time":"2021-02-20T19:20:11Z"}
+{"level":"info","msg":"start.go  1613848811104","time":"2021-02-20T19:20:11Z"}
+{"level":"info","msg":"getContainer starts 1613848811104","time":"2021-02-20T19:20:11Z"}
+{"level":"info","msg":"getContainer ends 1613848811114","time":"2021-02-20T19:20:11Z"}
+{"level":"info","msg":"container.Exec() starts 1613848811121","time":"2021-02-20T19:20:11Z"}
+{"level":"info","msg":"container.Exec() ends 1613848811157","time":"2021-02-20T19:20:11Z"}

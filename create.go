@@ -66,7 +66,7 @@ command(s) that get executed on start, edit the args parameter of the spec. See
 		if err != nil {
 			return err
 		}
-		fmt.Print("create.go")
+		//fmt.Print("create.go")
 		logrus.Info(fmt.Sprintf("startContainer starts %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 		status, err := startContainer(context, spec, CT_ACT_CREATE, nil)
 		logrus.Info(fmt.Sprintf("startContainer ends %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))

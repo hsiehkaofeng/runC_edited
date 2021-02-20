@@ -38,29 +38,16 @@ your host.`,
 				return nil
 			},
 		)
-		logrus.Info(fmt.Sprintf("CPU instructions %+v",profileValue))
-		logrus.Info(fmt.Sprintf("getContainer ends %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 		if prof_err != nil{
 			logrus.Info(prof_err)
 		}
-		*/
-		//test
-		/*
-		var total int = 0
-		profileValue, prof_err := perf.CPUInstructions(
-			func() error{
-				total = 2
-				return nil
-			},
-		)
-		logrus.Info(fmt.Sprintf("CPU instructions %+v, total %d",profileValue,total))
-		if prof_err != nil{
-			logrus.Info(prof_err)
-		}*/
-		//
 		if err != nil {
 			return err
 		}
+		logrus.Info(fmt.Sprintf("CPU instructions %+v",profileValue))
+		*/
+		logrus.Info(fmt.Sprintf("getContainer ends %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+
 		status, err := container.Status()
 		if err != nil {
 			return err
