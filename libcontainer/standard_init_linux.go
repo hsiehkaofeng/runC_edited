@@ -3,12 +3,13 @@
 package libcontainer
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"runtime"
 	"strconv"
-	"fmt"
 	"time"
+
 	"github.com/opencontainers/runc/libcontainer/apparmor"
 	"github.com/opencontainers/runc/libcontainer/configs"
 	"github.com/opencontainers/runc/libcontainer/keys"
@@ -20,7 +21,6 @@ import (
 	"golang.org/x/sys/unix"
 
 	"github.com/sirupsen/logrus"
-	
 )
 
 type linuxStandardInit struct {
@@ -89,12 +89,12 @@ func (l *linuxStandardInit) Init() error {
 	}
 
 	// initialises the labeling system
-	logrus.Info(fmt.Sprintf("prepareRootfs starts from %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+	logrus.Info(fmt.Sprintf("prepareRootfs starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	selinux.GetEnabled()
 	if err := prepareRootfs(l.pipe, l.config); err != nil {
 		return err
 	}
-	logrus.Info(fmt.Sprintf("prepareRootfs ends at %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+	logrus.Info(fmt.Sprintf("prepareRootfs ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	// Set up the console. This has to be done *before* we finalize the rootfs,
 	// but *after* we've given the user the chance to set up all of the mounts
 	// they wanted.
@@ -150,7 +150,7 @@ func (l *linuxStandardInit) Init() error {
 	// Tell our parent that we're ready to Execv. This must be done before the
 	// Seccomp rules have been applied, because we need to be able to read and
 	// write to a socket.
-	logrus.Info(fmt.Sprintf("syncParentReady starts from %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+	logrus.Info(fmt.Sprintf("syncParentReady starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	if err := syncParentReady(l.pipe); err != nil {
 		return errors.Wrap(err, "sync ready")
 	}
@@ -161,14 +161,18 @@ func (l *linuxStandardInit) Init() error {
 	// Without NoNewPrivileges seccomp is a privileged operation, so we need to
 	// do this before dropping capabilities; otherwise do it as late as possible
 	// just before execve so as few syscalls take place after it as possible.
+	logrus.Info(fmt.Sprintf("InitSeccomp starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	if l.config.Config.Seccomp != nil && !l.config.NoNewPrivileges {
 		if err := seccomp.InitSeccomp(l.config.Config.Seccomp); err != nil {
 			return err
 		}
 	}
+	logrus.Info(fmt.Sprintf("InitSeccomp ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
+	logrus.Info(fmt.Sprintf("finalizeNamespace starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	if err := finalizeNamespace(l.config); err != nil {
 		return err
 	}
+	logrus.Info(fmt.Sprintf("finalizeNamespace ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	// finalizeNamespace can change user/group which clears the parent death
 	// signal, so we restore it here.
 	if err := pdeath.Restore(); err != nil {
@@ -188,6 +192,7 @@ func (l *linuxStandardInit) Init() error {
 		return err
 	}
 	// Close the pipe to signal that we have completed our init.
+	//logrus.Info(fmt.Sprintf("l.pipe.Close starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	l.pipe.Close()
 	// Wait for the FIFO to be opened on the other side before exec-ing the
 	// user process. We open it through /proc/self/fd/$fd, because the fd that
@@ -222,11 +227,11 @@ func (l *linuxStandardInit) Init() error {
 	if err := l.config.Config.Hooks[configs.StartContainer].RunHooks(s); err != nil {
 		return err
 	}
-	fmt.Println("exe starts ",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond))
+	fmt.Println("exe starts ", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond))
 	//logrus.Info(fmt.Sprintf("exe  %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 	if err := unix.Exec(name, l.config.Args[0:], os.Environ()); err != nil {
 		return newSystemErrorWithCause(err, "exec user process")
 	}
-	fmt.Print("exe ends ",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond))
+	fmt.Print("exe ends ", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond))
 	return nil
 }

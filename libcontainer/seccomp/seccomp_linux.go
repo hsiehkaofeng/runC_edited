@@ -6,13 +6,14 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"os"
-	"strings"
-
 	"github.com/opencontainers/runc/libcontainer/configs"
 	"github.com/opencontainers/runc/libcontainer/seccomp/patchbpf"
+	"os"
+	"strings"
+	"time"
 
 	libseccomp "github.com/seccomp/libseccomp-golang"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/sys/unix"
 )
 
@@ -43,13 +44,15 @@ func InitSeccomp(config *configs.Seccomp) error {
 	if err != nil {
 		return errors.New("error initializing seccomp - invalid default action")
 	}
-
+	logrus.Info(fmt.Sprintf("libseccomp.NewFilter starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	filter, err := libseccomp.NewFilter(defaultAction)
 	if err != nil {
 		return fmt.Errorf("error creating filter: %s", err)
 	}
+	logrus.Info(fmt.Sprintf("libseccomp.NewFilter ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 
 	// Add extra architectures
+	logrus.Info(fmt.Sprintf("Add_extra_architectures starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	for _, arch := range config.Architectures {
 		scmpArch, err := libseccomp.GetArchFromString(arch)
 		if err != nil {
@@ -59,12 +62,14 @@ func InitSeccomp(config *configs.Seccomp) error {
 			return fmt.Errorf("error adding architecture to seccomp filter: %s", err)
 		}
 	}
+	logrus.Info(fmt.Sprintf("Add_extra_architectures ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 
 	// Unset no new privs bit
 	if err := filter.SetNoNewPrivsBit(false); err != nil {
 		return fmt.Errorf("error setting no new privileges: %s", err)
 	}
 
+	logrus.Info(fmt.Sprintf("Add_a_rule_for_each_syscall starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	// Add a rule for each syscall
 	for _, call := range config.Syscalls {
 		if call == nil {
@@ -74,9 +79,13 @@ func InitSeccomp(config *configs.Seccomp) error {
 			return err
 		}
 	}
+	logrus.Info(fmt.Sprintf("Add_a_rule_for_each_syscall ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
+
+	logrus.Info(fmt.Sprintf("PatchAndLoad starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	if err := patchbpf.PatchAndLoad(config, filter); err != nil {
 		return fmt.Errorf("error loading seccomp filter into kernel: %s", err)
 	}
+	logrus.Info(fmt.Sprintf("PatchAndLoad ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	return nil
 }
 

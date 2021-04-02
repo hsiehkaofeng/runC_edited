@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+
 	//"log"
 	"github.com/opencontainers/runc/libcontainer/cgroups"
 	"github.com/opencontainers/runc/libcontainer/cgroups/fs2"
@@ -87,8 +88,7 @@ func (p *setnsProcess) signal(sig os.Signal) error {
 }
 
 func (p *setnsProcess) start() (retErr error) {
-	
-	
+
 	defer p.messageSockPair.parent.Close()
 	err := p.cmd.Start()
 	// close the write-side of the pipes (controlled by child)
@@ -311,12 +311,12 @@ func (p *initProcess) waitForChildExit(childPid int) error {
 }
 
 func (p *initProcess) start() (retErr error) {
-	logrus.Info(fmt.Sprintf("initProcess.start() starts from %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
-	
+	logrus.Info(fmt.Sprintf("initProcess.start() starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
+
 	defer p.messageSockPair.parent.Close()
-	logrus.Info(fmt.Sprintf("p.cmd.Start starts from %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+	//logrus.Info(fmt.Sprintf("p.cmd.Start starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	err := p.cmd.Start()
-	logrus.Info(fmt.Sprintf("p.cmd.Start ends at %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+	//logrus.Info(fmt.Sprintf("p.cmd.Start ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 
 	p.process.ops = p
 	// close the write-side of the pipes (controlled by child)
@@ -343,17 +343,25 @@ func (p *initProcess) start() (retErr error) {
 	// Do this before syncing with child so that no children can escape the
 	// cgroup. We don't need to worry about not doing this and not being root
 	// because we'd be using the rootless cgroup manager in that case.
+	logrus.Info(fmt.Sprintf("p.manager.Apply(p.pid()) starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	if err := p.manager.Apply(p.pid()); err != nil {
 		return newSystemErrorWithCause(err, "applying cgroup configuration for process")
 	}
+	logrus.Info(fmt.Sprintf("p.manager.Apply(p.pid()) ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
+
+	logrus.Info(fmt.Sprintf("p.intelRdtManager.Apply starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	if p.intelRdtManager != nil {
 		if err := p.intelRdtManager.Apply(p.pid()); err != nil {
 			return newSystemErrorWithCause(err, "applying Intel RDT configuration for process")
 		}
 	}
+	logrus.Info(fmt.Sprintf("p.intelRdtManager.Apply ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
+
+	logrus.Info(fmt.Sprintf("io.Copy starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	if _, err := io.Copy(p.messageSockPair.parent, p.bootstrapData); err != nil {
 		return newSystemErrorWithCause(err, "copying bootstrap data to pipe")
 	}
+	logrus.Info(fmt.Sprintf("io.Copy ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	childPid, err := p.getChildPid()
 	if err != nil {
 		return newSystemErrorWithCause(err, "getting the final child's pid from pipe")
@@ -366,23 +374,28 @@ func (p *initProcess) start() (retErr error) {
 	if err != nil {
 		return newSystemErrorWithCausef(err, "getting pipe fds for pid %d", childPid)
 	}
+	//logrus.Info(fmt.Sprintf("p.setExternalDescriptors starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	p.setExternalDescriptors(fds)
-
+	//logrus.Info(fmt.Sprintf("p.setExternalDescriptors ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
+	logrus.Info(fmt.Sprintf("setup_cgroup_namesapce starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	// Now it's time to setup cgroup namesapce
 	if p.config.Config.Namespaces.Contains(configs.NEWCGROUP) && p.config.Config.Namespaces.PathOf(configs.NEWCGROUP) == "" {
 		if _, err := p.messageSockPair.parent.Write([]byte{createCgroupns}); err != nil {
 			return newSystemErrorWithCause(err, "sending synchronization value to init process")
 		}
 	}
+	logrus.Info(fmt.Sprintf("setup_cgroup_namesapce ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 
 	// Wait for our first child to exit
 	if err := p.waitForChildExit(childPid); err != nil {
 		return newSystemErrorWithCause(err, "waiting for our first child to exit")
 	}
-
+	//logrus.Info(fmt.Sprintf("createNetworkInterfaces starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	if err := p.createNetworkInterfaces(); err != nil {
 		return newSystemErrorWithCause(err, "creating network interfaces")
 	}
+	//logrus.Info(fmt.Sprintf("createNetworkInterfaces ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
+
 	if err := p.updateSpecState(); err != nil {
 		return newSystemErrorWithCause(err, "updating the spec state")
 	}
@@ -393,11 +406,11 @@ func (p *initProcess) start() (retErr error) {
 		sentRun    bool
 		sentResume bool
 	)
-	logrus.Info(fmt.Sprintf("parseSync starts from %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+	logrus.Info(fmt.Sprintf("parseSync starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	ierr := parseSync(p.messageSockPair.parent, func(sync *syncT) error {
 		switch sync.Type {
-		case procReady:	
-			logrus.Info(fmt.Sprintf("procReady starts from %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+		case procReady:
+			logrus.Info(fmt.Sprintf("procReady starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 			// set rlimits, this has to be done here because we lose permissions
 			// to raise the limits once we enter a user-namespace
 			if err := setupRlimits(p.config.Rlimits, p.pid()); err != nil {
@@ -460,9 +473,9 @@ func (p *initProcess) start() (retErr error) {
 				return newSystemErrorWithCause(err, "writing syncT 'run'")
 			}
 			sentRun = true
-			logrus.Info(fmt.Sprintf("procReady ends at %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+			logrus.Info(fmt.Sprintf("procReady ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 		case procHooks:
-			logrus.Info(fmt.Sprintf("procHooks starts from %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+			logrus.Info(fmt.Sprintf("procHooks starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 			// Setup cgroup before prestart hook, so that the prestart hook could apply cgroup permissions.
 			if err := p.manager.Set(p.config.Config); err != nil {
 				return newSystemErrorWithCause(err, "setting cgroup config for procHooks process")
@@ -494,14 +507,14 @@ func (p *initProcess) start() (retErr error) {
 				return newSystemErrorWithCause(err, "writing syncT 'resume'")
 			}
 			sentResume = true
-			logrus.Info(fmt.Sprintf("procHooks ends at %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+			logrus.Info(fmt.Sprintf("procHooks ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 		default:
 			return newSystemError(errors.New("invalid JSON payload from child"))
 		}
 
 		return nil
 	})
-	logrus.Info(fmt.Sprintf("parseSync ends at %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+	logrus.Info(fmt.Sprintf("parseSync ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	if !sentRun {
 		return newSystemErrorWithCause(ierr, "container init")
 	}
@@ -517,8 +530,8 @@ func (p *initProcess) start() (retErr error) {
 		p.wait()
 		return ierr
 	}
-	//log.Println("end timestamp ",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond))	
-	logrus.Info(fmt.Sprintf("initProcess.start() ends at %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+	//log.Println("end timestamp ",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond))
+	logrus.Info(fmt.Sprintf("initProcess.start() ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	return nil
 }
 

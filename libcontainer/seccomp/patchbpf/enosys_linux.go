@@ -4,19 +4,19 @@ package patchbpf
 
 import (
 	"encoding/binary"
-	"io"
-	"os"
-	"runtime"
-	"unsafe"
-
+	"fmt"
 	"github.com/opencontainers/runc/libcontainer/configs"
 	"github.com/opencontainers/runc/libcontainer/utils"
-
 	"github.com/pkg/errors"
 	libseccomp "github.com/seccomp/libseccomp-golang"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/bpf"
 	"golang.org/x/sys/unix"
+	"io"
+	"os"
+	"runtime"
+	"time"
+	"unsafe"
 )
 
 // #cgo pkg-config: libseccomp
@@ -600,11 +600,12 @@ func sysSeccompSetFilter(flags uint, filter []unix.SockFilter) (err error) {
 // into the kernel for the current process.
 func PatchAndLoad(config *configs.Seccomp, filter *libseccomp.ScmpFilter) error {
 	// Generate a patched filter.
+	logrus.Info(fmt.Sprintf("enosysPatchFilter starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	fprog, err := enosysPatchFilter(config, filter)
 	if err != nil {
 		return errors.Wrap(err, "patching filter")
 	}
-
+	logrus.Info(fmt.Sprintf("enosysPatchFilter ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	// Get the set of libseccomp flags set.
 	seccompFlags, noNewPrivs, err := filterFlags(filter)
 	if err != nil {
@@ -620,9 +621,11 @@ func PatchAndLoad(config *configs.Seccomp, filter *libseccomp.ScmpFilter) error 
 		}
 	}
 
+	logrus.Info(fmt.Sprintf("sysSeccompSetFilter starts from %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	// Finally, load the filter.
 	if err := sysSeccompSetFilter(seccompFlags, fprog); err != nil {
 		return errors.Wrap(err, "loading seccomp filter")
 	}
+	logrus.Info(fmt.Sprintf("sysSeccompSetFilter ends at %v", int64(time.Nanosecond)*time.Now().UnixNano()/int64(time.Millisecond)))
 	return nil
 }
