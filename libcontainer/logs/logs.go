@@ -64,7 +64,8 @@ func processEntry(text []byte) {
 }
 
 func ConfigureLogging(config Config) error {
-	config.LogFilePath = "/home/khsieh3/util/runC_edited/test-log"
+	//config.LogFilePath = "/home/khsieh3/util/runC_edited/test-log"
+	config.LogFilePath = "/home/khsieh3/ramdisk/test-log"
 	configureMutex.Lock()
 	defer configureMutex.Unlock()
 

@@ -311,25 +311,13 @@ func (p *initProcess) waitForChildExit(childPid int) error {
 }
 
 func (p *initProcess) start() (retErr error) {
-	//open the log file
-	/*
-	f, err := os.OpenFile("testlogfile", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
-	if err != nil {
-		log.Fatalf("error opening file: %v", err)
-	}
-	defer f.Close()
-
-	log.SetOutput(f)
-	log.Println("log starts ",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond))
-	*/
-	//
-	//fmt.Printf("here");
-	logrus.Info(fmt.Sprintf("initProcess starts %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+	logrus.Info(fmt.Sprintf("initProcess.start() starts from %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+	
 	defer p.messageSockPair.parent.Close()
+	logrus.Info(fmt.Sprintf("p.cmd.Start starts from %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 	err := p.cmd.Start()
-	//
-	//log.Println("second timestamp ",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond))	
-	//
+	logrus.Info(fmt.Sprintf("p.cmd.Start ends at %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+
 	p.process.ops = p
 	// close the write-side of the pipes (controlled by child)
 	p.messageSockPair.child.Close()
@@ -405,10 +393,11 @@ func (p *initProcess) start() (retErr error) {
 		sentRun    bool
 		sentResume bool
 	)
-
+	logrus.Info(fmt.Sprintf("parseSync starts from %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 	ierr := parseSync(p.messageSockPair.parent, func(sync *syncT) error {
 		switch sync.Type {
-		case procReady:
+		case procReady:	
+			logrus.Info(fmt.Sprintf("procReady starts from %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 			// set rlimits, this has to be done here because we lose permissions
 			// to raise the limits once we enter a user-namespace
 			if err := setupRlimits(p.config.Rlimits, p.pid()); err != nil {
@@ -471,7 +460,9 @@ func (p *initProcess) start() (retErr error) {
 				return newSystemErrorWithCause(err, "writing syncT 'run'")
 			}
 			sentRun = true
+			logrus.Info(fmt.Sprintf("procReady ends at %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 		case procHooks:
+			logrus.Info(fmt.Sprintf("procHooks starts from %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 			// Setup cgroup before prestart hook, so that the prestart hook could apply cgroup permissions.
 			if err := p.manager.Set(p.config.Config); err != nil {
 				return newSystemErrorWithCause(err, "setting cgroup config for procHooks process")
@@ -503,13 +494,14 @@ func (p *initProcess) start() (retErr error) {
 				return newSystemErrorWithCause(err, "writing syncT 'resume'")
 			}
 			sentResume = true
+			logrus.Info(fmt.Sprintf("procHooks ends at %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 		default:
 			return newSystemError(errors.New("invalid JSON payload from child"))
 		}
 
 		return nil
 	})
-
+	logrus.Info(fmt.Sprintf("parseSync ends at %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 	if !sentRun {
 		return newSystemErrorWithCause(ierr, "container init")
 	}
@@ -526,7 +518,7 @@ func (p *initProcess) start() (retErr error) {
 		return ierr
 	}
 	//log.Println("end timestamp ",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond))	
-	logrus.Info(fmt.Sprintf("initProcess ends %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
+	logrus.Info(fmt.Sprintf("initProcess.start() ends at %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 	return nil
 }
 

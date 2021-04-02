@@ -19,7 +19,7 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/sys/unix"
 
-	//"github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	
 )
 
@@ -89,10 +89,12 @@ func (l *linuxStandardInit) Init() error {
 	}
 
 	// initialises the labeling system
+	logrus.Info(fmt.Sprintf("prepareRootfs starts from %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 	selinux.GetEnabled()
 	if err := prepareRootfs(l.pipe, l.config); err != nil {
 		return err
 	}
+	logrus.Info(fmt.Sprintf("prepareRootfs ends at %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 	// Set up the console. This has to be done *before* we finalize the rootfs,
 	// but *after* we've given the user the chance to set up all of the mounts
 	// they wanted.
@@ -148,6 +150,7 @@ func (l *linuxStandardInit) Init() error {
 	// Tell our parent that we're ready to Execv. This must be done before the
 	// Seccomp rules have been applied, because we need to be able to read and
 	// write to a socket.
+	logrus.Info(fmt.Sprintf("syncParentReady starts from %v",int64(time.Nanosecond) * time.Now().UnixNano() / int64(time.Millisecond)))
 	if err := syncParentReady(l.pipe); err != nil {
 		return errors.Wrap(err, "sync ready")
 	}
